@@ -30,10 +30,27 @@ import java.util.*;
         reader.close();
     }
     
+    /*
+	 * This method returns the distance between two places
+	 * @param other: a place object
+	 * @return distance: the distance between the place object and the "other" place object
+	 */
+	public static double distanceTo(int zip1, int zip2) {
+        double R = 3963.1676;
+		double phi1 = Math.toRadians(zips.get(zip1)[0]);
+		double phi2 = Math.toRadians(zips.get(zip2)[0]);
+		double pi1 = Math.toRadians(zips.get(zip1)[1]);
+		double pi2 = Math.toRadians(zips.get(zip2)[1]);
+		double distance = (R * (    Math.acos(   (Math.sin(phi1)*Math.sin(phi2)) +
+				(Math.cos(phi1)*Math.cos(phi2)*Math.cos(pi1 - pi2)))));
+		return distance;
+    }
+    
     public static void main(String[] args) throws FileNotFoundException, IOException {
         readInZipCodes();
         for (Integer i: zips.keySet()) {
             System.out.println("ZIP: " + i + ", LAT: " + zips.get(i)[0] + ", LNG: " + zips.get(i)[1]);
         }
+        System.out.println("Distance between 28035 and 28036: " + distanceTo(28035, 28036));
     }
  }
