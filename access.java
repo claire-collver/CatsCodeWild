@@ -20,9 +20,14 @@ import java.util.*;
 
     private static HashMap<Double, Integer> distanceVisits = new HashMap<Double, Integer>();
 
-    //private static HashMap<Integer, Double> zipPoverty = new HashMap<Integer, Double>();
+    //private static HashMap<Integer, Double> zipToPoverty = new HashMap<Integer, Double>();
 
-    private static HashMap<Integer, Integer> tractToZip = new HashMap<Integer, Integer>();
+    private static HashMap<String, Integer> tractToZip = new HashMap<String, Integer>();
+
+    private static HashMap<Integer, Integer[]> zipToPoverty = new HashMap<Integer, Integer[]>();
+    private static ArrayList<VisitRecord> visitList = new ArrayList<VisitRecord>();
+      private static ArrayList<PovertyRecord> povertyList = new ArrayList<PovertyRecord>();
+
 
     public static void readInTractToZip() throws FileNotFoundException, IOException {
         //change this file
@@ -34,11 +39,12 @@ import java.util.*;
         while (line != null && !line.isEmpty()) {
 
             String[] fields = line.split(",");
+
             try {
 
               int zipcode = Integer.valueOf(fields[0].trim());
-              int tract = Integer.valueOf(fields[1].trim());
-              System.out.println()
+
+              String tract = fields[1].trim();
 
               if(! tractToZip.containsKey(tract)){
                 tractToZip.put(tract, zipcode);
@@ -48,10 +54,70 @@ import java.util.*;
               }
 
             catch (NumberFormatException e) {
+
             }
             line = reader.readLine();
     }
         reader.close();
+    }
+
+    public static void readInPoverty() throws FileNotFoundException, IOException {
+        //change this file
+        BufferedReader reader = new BufferedReader(new FileReader("poverty.csv"));
+
+        reader.readLine(); //skip line 1
+        reader.readLine();
+        String line = reader.readLine();
+
+        while (line != null && !line.isEmpty()) {
+
+            String[] fields = line.split(",");
+
+            try {
+
+              String tract = fields[1].trim();
+              if(tractToZip.get(tract) != null){
+
+                int zipcode = tractToZip.get(tract);
+
+                if(! zipToPoverty.containsKey(zipcode)){
+                  Integer[] nums = new Integer[2];
+                  nums[0] = Integer.valueOf(fields[7].trim());
+
+                  nums[1] = Integer.valueOf(fields[5]);
+
+                  zipToPoverty.put(zipcode, nums);
+                }
+                else{
+                  Integer[] temp = zipToPoverty.get(zipcode);
+                  temp[0] += Integer.valueOf(fields[7].trim());
+                  temp[1] += Integer.valueOf(fields[5].trim());
+                  zipToPoverty.replace(zipcode, temp);
+                }
+
+              }
+
+
+
+              }
+
+            catch (NumberFormatException e) {
+
+            }
+            line = reader.readLine();
+    }
+        reader.close();
+
+        for(Integer zip : zipToPoverty.keySet()){
+          Double pov = Double.valueOf(zipToPoverty.get(zip)[0])/ zipToPoverty.get(zip)[1];
+          PovertyRecord t = new PovertyRecord(zip, pov);
+          povertyList.add(t);
+          //System.out.println(pov);
+        }
+        Collections.sort(povertyList);
+        for (int i = 0; i < 10; i++) {
+          System.out.println(povertyList.get(i).getZipcode() + " " + povertyList.get(i).getPercentageInPoverty());
+        }
     }
 
 
@@ -115,8 +181,9 @@ import java.util.*;
                 int totalH = Integer.valueOf(fields[5].trim());
                 int totalOther = Integer.valueOf(fields[6].trim());
                 int sum = totalAA + totalAI + totalA + totalC + totalH + totalOther;
-                zipVisits.put(zipcode, sum);
 
+                zipVisits.put(zipcode, sum);
+                visitList.add(new VisitRecord(zipcode, sum));
               }
 
             }
@@ -143,18 +210,20 @@ import java.util.*;
 
 
     public static void main(String[] args) throws FileNotFoundException, IOException {
-
+      readInZipCodes();
       readInTractToZip();
 
-      for(Integer i : tractToZip.keySet()){
-        System.out.println(i + " zip: " + tractToZip.get(i));
-      }
+      readInPoverty();
+      //readInPopulation();
+
       //
-      // readInZipCodes();
+
       //
-      // readInCSV();
+      readInCSV();
       //
-      // calculateDistances();
+      calculateDistances();
+      Collections.sort(visitList);
+
 
     }
  }
