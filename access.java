@@ -214,15 +214,16 @@ import java.util.*;
       readInTractToZip();
 
       readInPoverty();
-      //readInPopulation();
-
-      //
 
       //
       readInCSV();
       //
       calculateDistances();
       Collections.sort(visitList);
+      for (int i = 0; i < 10; i++) {
+        System.out.println(visitList.get(i).getZipcode() + " " + visitList.get(i).getNumVisits());
+      }
+
 
 
     }

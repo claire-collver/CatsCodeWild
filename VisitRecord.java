@@ -1,7 +1,7 @@
 import java.util.PriorityQueue;
 
 public class VisitRecord implements Comparable<VisitRecord>{
-    
+
     private int zipcode;
     private int numVisits;
 
@@ -23,5 +23,9 @@ public class VisitRecord implements Comparable<VisitRecord>{
 
     public int getZipcode() {
         return zipcode;
+    }
+
+    public int getNumVisits() {
+        return numVisits;
     }
 }
